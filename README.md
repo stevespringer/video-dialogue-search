@@ -1,6 +1,8 @@
 # Video Dialogue Search
 
-Generate transcriptions with OpenAI's Whisper and search your videos' dialouge by keyword
+Generate transcriptions with OpenAI's Whisper and search your videos' dialouge by keyword.
+
+This repo accompanies the blog post https://stevesdevnotes.hashnode.dev/search-video-files-by-their-dialogue
 
 ## Demo
 
