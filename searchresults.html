@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 0;
+		}
+
+		.container {
+			display: flex;
+			height: 100vh;
+		}
+
+		.left {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-color: #f2f2f2;
+			padding: 1rem;
+		}
+
+		.right {
+			flex: 2;
+			padding: 1rem;
+			overflow-y: scroll;
+		}
+
+		.video {
+			width: 100%;
+			height: auto;
+		}
+
+		h2 {
+			margin: 0;
+			padding-bottom: 1rem;
+			border-bottom: 1px solid #ccc;
+		}
+
+		.result {
+			margin-bottom: 1rem;
+		}
+
+		.result a {
+			font-weight: bold;
+			text-decoration: none;
+			color: blue;
+		}
+
+		.result a:hover {
+			text-decoration: underline;
+		}
+
+		.timestamp {
+			font-size: 0.8rem;
+			color: #666;
+			margin-bottom: 0.5rem;
+		}
+
+		.excerpt {
+			font-size: 0.9rem;
+			line-height: 1.2;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="left">
+			<video class="video" controls>
+				<source src="" type="video/mp4">
+				Your browser does not support the video tag.
+			</video>
+		</div>
+		<div class="right">
+			<h2></h2>
+		</div>
+	</div>
+	<script>
+
+		// Get the value of the "data" parameter from the querystring
+		const urlParams = new URLSearchParams(window.location.search);
+		const dataParam = urlParams.get('data');
+
+		// Load the JSON file using the value of the "data" parameter
+		const jsonUrl = `${dataParam}`;
+		fetch(jsonUrl)
+			.then(response => response.json())
+			.then(loadData)
+			.catch(error => console.error(error));
+
+		function loadData(results) {
+
+
+			// Update the page title and heading
+			const pageTitle = `Search Results for "${urlParams.get('query')}" - ${results.length} results`;
+			document.title = pageTitle;
+			const heading = document.querySelector("h2");
+			heading.textContent = pageTitle;
+
+			// Get a reference to the .right div
+			const rightDiv = document.querySelector('.right');
+
+			// Loop through the results array and append a .result div for each item
+			for (let i = 0; i < results.length; i++) {
+
+				const result = results[i];
+
+				// Create a new .result div
+				const resultDiv = document.createElement('div');
+				resultDiv.classList.add('result');
+
+				// Create a hyperlink with hh:mm:ss and video name as the text content
+				const timestamp = formatTime(result.start);
+				const link = document.createElement('a');
+				link.setAttribute('href', '#');
+				link.textContent = result.file;
+				link.addEventListener('click', (event) => {
+					event.preventDefault();
+					const videoPlayer = document.querySelector('video');
+					videoPlayer.src = `${result.file}#t=${result.start / 1000}`;
+					videoPlayer.play();
+				});
+				resultDiv.appendChild(link);
+
+				// Create a div for the timestamp
+				const timestampDiv = document.createElement('div');
+				timestampDiv.classList.add('timestamp');
+				timestampDiv.textContent = timestamp;
+				resultDiv.appendChild(timestampDiv);
+
+				// Create a div for the excerpt
+				const excerptDiv = document.createElement('div');
+				excerptDiv.classList.add('excerpt');
+				excerptDiv.textContent = result.text;
+				resultDiv.appendChild(excerptDiv);
+
+				// Append the .result div to the .right div
+				rightDiv.appendChild(resultDiv);
+			}
+
+		}
+
+		// Function to format time in hh:mm:ss format
+		function formatTime(timeInMs) {
+			const timeInSeconds = Math.floor(timeInMs / 1000);
+			const hours = Math.floor(timeInSeconds / 3600);
+			const minutes = Math.floor((timeInSeconds % 3600) / 60);
+			const seconds = Math.floor(timeInSeconds % 60);
+
+			const hoursStr = hours.toString().padStart(2, "0");
+			const minutesStr = minutes.toString().padStart(2, "0");
+			const secondsStr = seconds.toString().padStart(2, "0");
+
+			return hoursStr + ":" + minutesStr + ":" + secondsStr;
+		}
+
+	</script>
+</body>
+
+</html>
